@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <!-- 
+    장소ID 기반. 키워드 검색 / 카테고리 검색으로 획득 가능
+    https://map.kakao.com/link/map/18577297
+    검색
+    https://map.kakao.com/link/search/카카오
+
+  -->
+  <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=79041506a32c6f35e2df475971e97fac&libraries=services,clusterer"></script>
+</head>
+<body style="margin:0;">
+  <div id="map" style="width:100vw;height:100vh;margin:0;padding:0;">
+
+  </div>
+  <script>
+    // https://apis.map.kakao.com/web/documentation/#Library
+
+
+    var container = document.getElementById('map'); //지도를 담을 영역의 DOM 레퍼런스
+    var options = { //지도를 생성할 때 필요한 기본 옵션
+      center: new kakao.maps.LatLng(37.5607318, 126.9678439), //필수!! 지도의 중심좌표.
+      level: 3 //지도의 레벨(확대, 축소 정도)
+    };
+
+    var map = new kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
+
+
+    // 컨트롤 추가
+    var control = new kakao.maps.ZoomControl();
+    map.addControl(control, kakao.maps.ControlPosition.TOPRIGHT); 
+
+
+    const categorySearchResultLocation = [];
+    var categorySearchCallback = function(result, status) {
+      if (status === kakao.maps.services.Status.OK) {
+        result.forEach(element => {
+          categorySearchResultLocation.push(
+            new kakao.maps.Marker({
+              position: new kakao.maps.LatLng( element.x, element.y )
+            })
+          );
+        })
+        console.log(categorySearchResultLocation);
+      }
+    };
+    // for(let i=0; i<callbackResult.length; i++){
+    // }
+    // callbackResult
+
+
+    // 검색 서비스
+    var places = new kakao.maps.services.Places();
+
+    // // 키워드 검색 기능
+    // places.keywordSearch('판교 ATM', callback);
+
+    // 카테고리 검색 기능 (영역 지정 필수)
+    places.categorySearch('BK9', categorySearchCallback, {
+      location: new kakao.maps.LatLng(37.564968, 126.939909),
+      useMapCenter: false,
+      useMapBounds: false
+    });
+
+
+    // // 주소 좌표 변환 서비스
+    // var geocoder = new kakao.maps.services.Geocoder();
+
+    // // 주소 -> 좌표 기능
+    // geocoder.addressSearch('해남군 송지면', callback);
+
+
+
+    console.log("before custerer");
+    // 마커 클러스터러
+    var clusterer = new kakao.maps.MarkerClusterer({
+      map: map,
+      markers: categorySearchResultLocation,
+      gridSize: 35,
+      averageCenter: true,
+      minLevel: 6,
+      disableClickZoom: true,
+      styles: [{
+        width : '53px', height : '52px',
+        background: 'url(cluster.png) no-repeat',
+        color: '#fff',
+        textAlign: 'center',
+        lineHeight: '54px'
+      }]
+    });
+    console.log("after custerer");
+  </script>
+</body>
+</html>

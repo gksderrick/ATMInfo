@@ -1,0 +1,3 @@
+cd finmap
+node server
+ngrok http --domain=hookworm-square-lark.ngrok-free.app 4000

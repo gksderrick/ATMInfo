@@ -1,0 +1,34 @@
+curl -X POST "https://developers.kftc.or.kr/finmap/oauth/2.0/token" -H "accept: application/json" -H "Content-Type: application/x-www-form-urlencoded" -d "client_id=e9c15224-1682-446d-b12f-9456df7c4a17&client_secret=cecf3064-78a7-4390-985c-84cf408b8aed&scope=finmap&grant_type=client_credentials"
+
+curl -X GET "https://testapi.openbanking.or.kr/oauth/2.0/authorize?response_type=code&client_id=e9c15224-1682-446d-b12f-9456df7c4a17&redirect_uri=https://developers.kftc.or.kr/dev/openapi/map/atm&scope=login%20inquiry%20transfer&state=1234567890123456789012&auth_type=0"
+
+curl -X GET "https://testapi.openbanking.or.kr/oauth/2.0/authorize_account?response_type=code&client_id=e9c15224-1682-446d-b12f-9456df7c4a17&redirect_uri=https://developers.kftc.or.kr/dev/openapi/map/atm&scope=login%20inquiry%20transfer&state=1234567890123456789012&auth_type=0"
+
+https://openapi.openbanking.or.kr/
+
+curl -X GET "https://testapi.openbanking.or.kr/oauth/2.0/authorize?response_type=code&client_id=a2e934d4-1dcd-4810-ae6f-5d14f5c9d2bd&redirect_uri=http://127.0.0.1:5500&scope=login%20inquiry%20transfer&state=1234567890123456789012&auth_type=0"
+
+curl -X GET "https://testfinmapapi.kftc.or.kr/oauth/2.0/authorize?response_type=code&client_id=a2e934d4-1dcd-4810-ae6f-5d14f5c9d2bd&redirect_uri=http://127.0.0.1:5500&scope=login%20inquiry%20transfer&state=1234567890123456789012&auth_type=0"
+
+https://testfinmapapi.kftc.or.kr
+https://testfinmapapi.openbanking.or.kr
+
+curl -X GET "
+https://testapi.openbanking.or.kr/oauth/2.0/authorize?
+response_type=code&
+client_id=a2e934d4-1dcd-4810-ae6f-5d14f5c9d2bd&
+redirect_uri=http://127.0.0.1:5500&
+scope=login%20inquiry%20transfer&
+state=1234567890123456789012&
+auth_type=0"
+
+
+
+
+
+
+
+
+
+
+
