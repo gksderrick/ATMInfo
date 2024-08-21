@@ -35,33 +35,92 @@
     map.addControl(control, kakao.maps.ControlPosition.TOPRIGHT); 
 
 
+    
+    var clusterer;
+
+    const searchResult = [];
     const categorySearchResultLocation = [];
     var categorySearchCallback = function(result, status) {
+      let newMarker;
+      let infoWindow = [];
+
+      searchResult.push(...result);
+      console.log("category search results");
+      console.log(searchResult);
+
       if (status === kakao.maps.services.Status.OK) {
-        result.forEach(element => {
-          categorySearchResultLocation.push(
-            new kakao.maps.Marker({
-              position: new kakao.maps.LatLng( element.x, element.y )
-            })
-          );
+        searchResult.forEach((element, index) => {
+          newMarker = new kakao.maps.Marker({
+            map: map,
+            position: new kakao.maps.LatLng(Number(element.y), Number(element.x))
+          })
+
+          categorySearchResultLocation.push(newMarker);
+
+          infoWindow.push(new kakao.maps.InfoWindow({
+            content: `infoWindow #${index}`
+          }));
+
+          // kakao.maps.event.addListener(newMarker, 'mouseover', function(){
+          //   infoWindow.open(map, newMarker);
+          // });
+          // kakao.maps.event.addListener(newMarker, 'mouseout', function(){
+          //   infoWindow.close();
+          // });
+          kakao.maps.event.addListener(categorySearchResultLocation[index], 'click', function(){
+            for(let i=0; i<categorySearchResultLocation.length; i++){
+              if(i !== index) infoWindow[i].close();
+              else{
+                infoWindow[index].open(map, categorySearchResultLocation[index]);
+                map.panTo(new kakao.maps.LatLng(
+                  categorySearchResultLocation[index].getPosition().getLat(),
+                  categorySearchResultLocation[index].getPosition().getLng()
+                ));
+              }
+            }
+            
+          });
+          kakao.maps.event.addListener(map, 'click', function(){
+            infoWindow[index].close();
+          });
+
+
+          // console.log(newMarker);
         })
+
+        // console.log("new marker list");
         console.log(categorySearchResultLocation);
       }
+      
+
+      // console.log("before custerer");
+      // 마커 클러스터러
+      clusterer = CreateMarkClusterer(categorySearchResultLocation);
+      // console.log(clusterer);
+      // console.log("after custerer");
     };
-    // for(let i=0; i<callbackResult.length; i++){
-    // }
-    // callbackResult
+
+    function CreateMarkClusterer(markerList){
+      return new kakao.maps.MarkerClusterer({
+        map: map,
+        markers: markerList,
+        gridSize: 35,
+        averageCenter: true,
+        minLevel: 6,
+        disableClickZoom: false
+      });
+    }
 
 
     // 검색 서비스
     var places = new kakao.maps.services.Places();
 
     // // 키워드 검색 기능
-    // places.keywordSearch('판교 ATM', callback);
+    // places.keywordSearch('ATM', callback);
 
     // 카테고리 검색 기능 (영역 지정 필수)
     places.categorySearch('BK9', categorySearchCallback, {
-      location: new kakao.maps.LatLng(37.564968, 126.939909),
+      location: new kakao.maps.LatLng(37.5606421, 126.9678918),
       useMapCenter: false,
       useMapBounds: false
     });
@@ -74,25 +133,6 @@
     // geocoder.addressSearch('해남군 송지면', callback);
 
 
-
-    console.log("before custerer");
-    // 마커 클러스터러
-    var clusterer = new kakao.maps.MarkerClusterer({
-      map: map,
-      markers: categorySearchResultLocation,
-      gridSize: 35,
-      averageCenter: true,
-      minLevel: 6,
-      disableClickZoom: true,
-      styles: [{
-        width : '53px', height : '52px',
-        background: 'url(cluster.png) no-repeat',
-        color: '#fff',
-        textAlign: 'center',
-        lineHeight: '54px'
-      }]
-    });
-    console.log("after custerer");
   </script>
 </body>
 </html>
