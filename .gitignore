@@ -2,3 +2,4 @@ finmap/node_modules/.bin/mime
 finmap/node_modules/.bin/nodemon
 finmap/node_modules/.bin/nodetouch
 finmap/node_modules/.bin/semver
+.vscode/tasks.json

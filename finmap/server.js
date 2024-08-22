@@ -4,7 +4,9 @@ const express = require("express");
 const app = express();
 const path = require("path");
 
-app.use(express.json());
+// app.use(express.json());
+// express.static: 정적 파일을 제공하기 위한 미들웨어
+app.use(express.static(path.join(__dirname, '.')));
 
 app.listen(4000, '0.0.0.0', function() {
   console.log("4000 포트, 서비스 시작.");
