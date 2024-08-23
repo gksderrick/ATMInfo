@@ -3,7 +3,7 @@
 var container = document.getElementById('map'); //지도를 담을 영역의 DOM 레퍼런스
 var options = { //지도를 생성할 때 필요한 기본 옵션
   center: new kakao.maps.LatLng(37.5607318, 126.9678439), //필수!! 지도의 중심좌표.
-  level: 3 //지도의 레벨(확대, 축소 정도)
+  level: 4 //지도의 레벨(확대, 축소 정도)
 };
 
 var map = new kakao.maps.Map(container, options); //지도 생성 및 객체 리턴
@@ -16,21 +16,31 @@ map.addControl(control, kakao.maps.ControlPosition.TOPRIGHT);
 export {map};
 
 class searchedPlace{
-  constructor(searchResult){
-    this.searchResult = searchResult;
-    this.marker = null;
+  constructor(location, marker=null, infoWindow=null){
+    this.location = location;
+    this.marker = marker;
+    this.infoWindow = infoWindow;
   }
-  createMarker(){
-
+  createMarker(y, x){
+    this.marker = new kakao.maps.Marker({
+      map: map,
+      position: new kakao.maps.LatLng(Number(y), Number(x))
+    });
+    return this.marker;
   }
   createInfoWindow(str = ''){
-
+    this.infoWindow = new kakao.maps.InfoWindow({
+      content: str
+    });
+    return this.infoWindow;
   }
 }
+let searchedPlaces = [];
 
 
+let clusterer;
 
-function CreateMarkClusterer(markerList){
+function CreateMarkerClusterer(markerList){
   return new kakao.maps.MarkerClusterer({
     map: map,
     markers: markerList,
@@ -41,78 +51,64 @@ function CreateMarkClusterer(markerList){
   });
 }
 
+function addInfoWindow(){
+  searchedPlaces.forEach((place,index,a)=>{
+    let thisMarker = place.marker;
 
+    place.createInfoWindow(place.location.place_name);
 
-
-function createMarker(){
-  // 검색 결과 각 항목마다
-  // 마커 생성, 마커 배열에 추가,
-  // 정보창 생성, 정보창 배열에 추가,
-  // 마커 클릭/맵 클릭 이벤트 발생 시
-  //   정보창 닫기/열기
-  searchResult.forEach((element, index) => {
-    newMarker = new kakao.maps.Marker({
-      map: map,
-      position: new kakao.maps.LatLng(Number(element.y), Number(element.x))
-    })
-
-    categorySearchResultLocation.push(newMarker);
-
-    infoWindow.push(new kakao.maps.InfoWindow({
-      content: `infoWindow #${index}`
-    }));
-    
-    kakao.maps.event.addListener(categorySearchResultLocation[index], 'click', function(){
-      for(let i=0; i<categorySearchResultLocation.length; i++){
-        if(i !== index) infoWindow[i].close();
+    // 클릭한 마커가 아니면 윈도우 닫기
+    // 클릭한 마커는 윈도우 열기, 맵 이동하기
+    kakao.maps.event.addListener(thisMarker, 'click', function(){
+      for(let i=0; i<searchedPlaces.length; i++){
+        if(i !== index){
+          searchedPlaces[i].infoWindow.close();
+        }
         else{
-          infoWindow[index].open(map, categorySearchResultLocation[index]);
+          place.infoWindow.open(map, thisMarker);
+
           map.panTo(new kakao.maps.LatLng(
-            categorySearchResultLocation[index].getPosition().getLat(),
-            categorySearchResultLocation[index].getPosition().getLng()
+            thisMarker.getPosition().getLat(),
+            thisMarker.getPosition().getLng()
           ));
         }
       }
-      
     });
     kakao.maps.event.addListener(map, 'click', function(){
-      infoWindow[index].close();
+      place.infoWindow.close();
     });
-
-  })
+  });
 }
 
-
-
-var clusterer;
-
-const searchResult = [];
-const categorySearchResultLocation = [];
-var categorySearchCallback = function(result, status) {
-  let newMarker;
-  let infoWindow = [];
-
-  if (status === kakao.maps.services.Status.OK) {
-
-    // searchResult: 카테고리 검색 결과를 저장
-    searchResult.push(...result);
-    console.log("category search results");
-    console.log(searchResult);
-
-    createMarker();
-  }
+function createMarker(searchResult){
+  const markers = [];
   
+  searchResult.forEach((location, index) => {
+    let newPlace = new searchedPlace(location);
+
+    // let newMarker = new kakao.maps.Marker({
+    //   map: map,
+    //   position: new kakao.maps.LatLng(Number(location.y), Number(location.x))
+    // });
+    let newMarker = newPlace.createMarker(location.y, location.x);
+
+    // searchedPlaces.push(new searchedPlace(location, newMarker));
+    searchedPlaces.push(newPlace);
+
+    markers.push(newMarker);
+  })
+  addInfoWindow();
   // 마커 클러스터러
-  clusterer = CreateMarkClusterer(categorySearchResultLocation);
+  clusterer = CreateMarkerClusterer(markers);
+}
+
+const categorySearchCallback = function(result, status) {
+  if (status === kakao.maps.services.Status.OK) {
+    // console.log("category search results");
+    // console.log(result);
+    createMarker(result);
+  }
 };
-
-
-
-
-
-
-
-
 
 
 
